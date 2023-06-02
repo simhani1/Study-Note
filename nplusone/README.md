@@ -18,7 +18,7 @@ public class Team {
     @Column(nullable = false)
     private String teamName;
 
-    @OneToMany(mappedBy = "team", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "team", fetch = FetchType.EAGER)
     private List<Member> memberList = new ArrayList<>();
 
     @Builder
@@ -42,7 +42,7 @@ public class Member {
     @Column(nullable = false)
     private String name;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "teamId", nullable = false)
     private Team team;
 
