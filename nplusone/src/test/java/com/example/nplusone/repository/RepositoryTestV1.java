@@ -69,6 +69,153 @@ public class RepositoryTestV1 {
         );
     }
 
+    @Test
+    public void fetch_join을_사용하여_해결() throws Exception {
+        // given
+        Team team = Team.builder()
+                .teamName("A")
+                .build();
+        Team team2 = Team.builder()
+                .teamName("B")
+                .build();
+
+        // when
+        Team savedTeam = teamRepository.save(team);
+        Team savedTeam2 = teamRepository.save(team2);
+        IntStream.range(0, 5)
+                .mapToObj(i -> Member.builder()
+                        .name("user" + i)
+                        .team(savedTeam)
+                        .build()).forEach(member -> memberRepository.save(member));
+        IntStream.range(0, 5)
+                .mapToObj(i -> Member.builder()
+                        .name("user" + i)
+                        .team(savedTeam2)
+                        .build()).forEach(member -> memberRepository.save(member));
+        flushAndClear();
+
+        // then
+        log.info("\n=============== fetch join을 사용한 경우 findAll() =================");
+        List<Team> teamList = teamRepository.findAllByFetchJoin();
+        teamList.forEach(
+                t -> {
+                    t.getMemberList()
+                            .forEach(
+                                    member -> System.out.println(member.getName())
+                            );
+                }
+        );
+    }
+
+    @Test
+    public void fetch_join_withou_distinct() throws Exception {
+        // given
+        Team team = Team.builder()
+                .teamName("A")
+                .build();
+        Team team2 = Team.builder()
+                .teamName("B")
+                .build();
+
+        // when
+        Team savedTeam = teamRepository.save(team);
+        Team savedTeam2 = teamRepository.save(team2);
+        IntStream.range(0, 5)
+                .mapToObj(i -> Member.builder()
+                        .name("user" + i)
+                        .team(savedTeam)
+                        .build()).forEach(member -> memberRepository.save(member));
+        IntStream.range(0, 5)
+                .mapToObj(i -> Member.builder()
+                        .name("user" + i)
+                        .team(savedTeam2)
+                        .build()).forEach(member -> memberRepository.save(member));
+        flushAndClear();
+
+        // then
+        log.info("\n=============== fetch join without distinct findAll() =================");
+        List<Team> teamList = teamRepository.findAllByFetchJoinWithoutDistinct();
+        System.out.println(teamList.size());
+        teamList.forEach(
+                t -> {
+                    System.out.println(t.getMemberList().size());
+                    t.getMemberList()
+                            .forEach(
+                                    member -> System.out.println(member.getName())
+                            );
+                }
+        );
+    }
+
+    @Test
+    public void join을_사용한_경우() throws Exception {
+        // given
+        Team team = Team.builder()
+                .teamName("A")
+                .build();
+        Team team2 = Team.builder()
+                .teamName("B")
+                .build();
+
+        // when
+        Team savedTeam = teamRepository.save(team);
+        Team savedTeam2 = teamRepository.save(team2);
+        IntStream.range(0, 5)
+                .mapToObj(i -> Member.builder()
+                        .name("user" + i)
+                        .team(savedTeam)
+                        .build()).forEach(member -> memberRepository.save(member));
+        IntStream.range(0, 5)
+                .mapToObj(i -> Member.builder()
+                        .name("user" + i)
+                        .team(savedTeam2)
+                        .build()).forEach(member -> memberRepository.save(member));
+        flushAndClear();
+
+        // then
+        log.info("\n=============== findAllByJoin() =================");
+        List<Team> teamList = teamRepository.findAllByJoin();
+        teamList.forEach(
+                t -> {
+                    t.getMemberList()
+                            .forEach(
+                                    member -> System.out.println(member.getName())
+                            );
+                }
+        );
+    }
+
+    @Test
+    public void join을_사용한_경우_Team객체는_프록시_객체() throws Exception {
+        // given
+        Team team = Team.builder()
+                .teamName("A")
+                .build();
+        Team team2 = Team.builder()
+                .teamName("B")
+                .build();
+
+        // when
+        Team savedTeam = teamRepository.save(team);
+        Team savedTeam2 = teamRepository.save(team2);
+        IntStream.range(0, 5)
+                .mapToObj(i -> Member.builder()
+                        .name("user" + i)
+                        .team(savedTeam)
+                        .build()).forEach(member -> memberRepository.save(member));
+        IntStream.range(0, 5)
+                .mapToObj(i -> Member.builder()
+                        .name("user" + i)
+                        .team(savedTeam2)
+                        .build()).forEach(member -> memberRepository.save(member));
+        flushAndClear();
+
+        // then
+        log.info("\n=============== findAllByJoin() =================");
+        List<Team> teamList = teamRepository.findAllByJoin();
+        System.out.println(teamList.get(0).getMemberList());
+    }
+
     private void flushAndClear() {
         em.flush();
         em.clear();

@@ -222,3 +222,58 @@ public class Member {
 
 내가 member에 대한 정보를 조회하는 시점에 쿼리가 발생한다는 점에서 즉시 로딩을 하는 경우보다 성능 상 이점이 존재한다.
 
+하지만 이는 즉시 로딩을 할 떄와 다른 점은 그저 조회 쿼리를 날리는 시점으 늦춰질 수 있다는 점 뿐이다. 쿼리 로그를 보면 결국 N + 1 문제가 발생했을 때와 똑같다.
+
+그렇다면 JPQL로 Join문을 내가 직접 작성해주면 해결되지 않을까?
+
+### join문 직접 작성하기
+
+```java
+@Query("select distinct t from Team t join t.memberList")
+List<Team> findAllByJoin();
+```
+위와 같이 쿼리를 작성하였다.
+
+즉 member들의 team id와 일치하는 모든 Team 엔티티를 조회하는 쿼리이다. 이렇게 조회를 한다면 Team에 소속 멤버들을 한번에 가져올 수 있을 것 같다.
+
+하지만 테스트 결과는 다음과 같다.
+
+![img.png](img/img_5.png)
+
+조회하는 쿼리는 inner join으로 잘 나간듯 하다. 하지만 member를 조회하는 순간 여전히 불필요한 쿼리 두 번이 발생한다.
+
+이유는 JPQL로 작성한 일반적인 join문은 Team의 칼럼들만 조회하고 join 대상의 영속성까지는 관여하지 않기 때문이다.
+
+즉 내가 team의 member를 참조하기 전 까지는 여전히 지연 로딩 전략으로 인해 Team 객체는 프록시 객체인 것이다.
+
+여전히 N + 1 문제가 발생하고 있다.
+
+이를 해결하기 위해 fetch join 전략을 사용해 보자.
+
+### Fetch join
+
+```java
+    @Query("select distinct t from Team t join fetch t.memberList")
+    List<Team> findAllByFetchJoin();
+
+```
+위와 같이 단순 join이 아닌 fetch join으로 쿼리를 작성하였다.
+
+fetch join의 뜻은 대상 엔티티를 한번에 불러 들이겠다는 뜻이다. 즉 Team을 조회하면서 Team에 속한 memeber들도 바로 조회시키는 것이다.
+
+테스트 결과는 다음과 같다.
+
+![img.png](img/img_6.png)
+
+그냥 join문을 사용했을 때랑 차이점은 조회하는 필드에 있다. 
+
+지금 쿼리는 Team의 모든 필드 + Member의 모든 필드를 조회하는 것을 볼 수 있다.
+
+드디어 N + 1 문제를 해결하였다. 하지만 fetch join을 사용할 때 주의할 점이 있다.
+
+![img.png](img/img_7.png)
+
+실행 결과를 보면 조회되는 user의 수가 중복되고 있는 것을 볼 수 있다. 팀의 개수는 2개, 각 팀 당 멤버 수는 5명이므로 조회 시 카티션 곱이 발생하여 총 10개의 팀이 조회되는 것이다.
+
+따라서 이런 중복을 피하기 위해서는 쿼리를 작성할 때 distinct를 반드시 넣어줘야 한다. 또는 엔티티에서 List가 아닌 중복을 제거해주는 Set을 사용하는 방법이 있다.
+
