@@ -250,30 +250,28 @@ List<Team> findAllByJoin();
 
 이를 해결하기 위해 fetch join 전략을 사용해 보자.
 
-### Fetch join
-
+### Fetch join - 컬렉션 조회
 ```java
-    @Query("select distinct t from Team t join fetch t.memberList")
-    List<Team> findAllByFetchJoin();
-
+@Query("select t from Team t join fetch t.memberList")
+List<Team> findAllByFetchJoinWithoutDistinct();
 ```
-위와 같이 단순 join이 아닌 fetch join으로 쿼리를 작성하였다.
-
-fetch join의 뜻은 대상 엔티티를 한번에 불러 들이겠다는 뜻이다. 즉 Team을 조회하면서 Team에 속한 memeber들도 바로 조회시키는 것이다.
-
-테스트 결과는 다음과 같다.
 
 ![img.png](img/img_6.png)
 
-그냥 join문을 사용했을 때랑 차이점은 조회하는 필드에 있다. 
+실행 결과를 보면 조회되는 user의 수가 중복되고 있는 것을 볼 수 있다. 팀의 개수는 2개, 각 팀 당 멤버 수는 5명이므로 조회 시 카티션 곱이 발생한다. 속히 말하는 데이터 뻥튀기가 발생한다.
 
-지금 쿼리는 Team의 모든 필드 + Member의 모든 필드를 조회하는 것을 볼 수 있다.
+당연히 일대다 관계인 Member를 조인하므로 그런 것이다. 이런 중복 데이터를 없애기 위해서는 SQL의 distinct로 해결하였다. 하지만 distinct의 경우 모든 칼럼의 값이 동일한 경우에 중복이 제거된다. 그러니 중복이 제거되지 않을 것이다.
 
-드디어 N + 1 문제를 해결하였다. 하지만 fetch join을 사용할 때 주의할 점이 있다.
+그러나 JPQL의 distinct는 1차적으로 쿼리에 distinct를 적용시키고 애플리케이션 단에서 2차적으로 한번 더 중복을 제거해준다.
+
+아래와 같이 쿼리를 조금 수정하여 실행결과를 살펴보자
+
+```java
+@Query("select distinct t from Team t join fetch t.memberList")
+List<Team> findAllByFetchJoin();
+```
 
 ![img.png](img/img_7.png)
 
-실행 결과를 보면 조회되는 user의 수가 중복되고 있는 것을 볼 수 있다. 팀의 개수는 2개, 각 팀 당 멤버 수는 5명이므로 조회 시 카티션 곱이 발생하여 총 10개의 팀이 조회되는 것이다.
-
-따라서 이런 중복을 피하기 위해서는 쿼리를 작성할 때 distinct를 반드시 넣어줘야 한다. 또는 엔티티에서 List가 아닌 중복을 제거해주는 Set을 사용하는 방법이 있다.
+아래와 같이 teamA에 속한 5명, teamB에 속한 5명에 대한 총 10개의 이름이 출력되는 것을 확인할 수 있다. 따라서 fetch join을 통해 컬렉션을 조회하는 경우에는 distinct를 반드시 붙여줘야 한다.
 

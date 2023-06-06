@@ -101,7 +101,7 @@ public class RepositoryTestV1 {
                 t -> {
                     t.getMemberList()
                             .forEach(
-                                    member -> System.out.println(member.getName())
+                                    member -> System.out.println("teamName: " + member.getTeam().getTeamName() + " , memberName: " + member.getName())
                             );
                 }
         );
@@ -135,13 +135,11 @@ public class RepositoryTestV1 {
         // then
         log.info("\n=============== fetch join without distinct findAll() =================");
         List<Team> teamList = teamRepository.findAllByFetchJoinWithoutDistinct();
-        System.out.println(teamList.size());
         teamList.forEach(
                 t -> {
-                    System.out.println(t.getMemberList().size());
                     t.getMemberList()
                             .forEach(
-                                    member -> System.out.println(member.getName())
+                                    member -> System.out.println("teamName: " + member.getTeam().getTeamName() + " , memberName: " + member.getName())
                             );
                 }
         );
