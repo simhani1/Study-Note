@@ -1,8 +1,8 @@
-# N + 1 문제
+<div align="center">
+    <h2>N + 1 문제</h2>
+</div>
 
-## 엔티티 설계
-
-### 즉시 로딩
+## 즉시 로딩
 ```java
 // Team
 
@@ -56,7 +56,7 @@ public class Member {
 }
 ```
 
-#### Test Code
+### Test Code
 ```java
     @Test
     public void 지연로딩_즉시로딩_비교() throws Exception {
@@ -85,7 +85,6 @@ public class Member {
         findTeam.getMemberList().get(0);
     }
 ```
-- N + 1 문제 발생
 
 즉시 로딩으로 설정이 되어 있으므로 `teamRepository.findAll()` 호출 시 저장 된 모든 팀 엔티티가 조회된다.
 
@@ -107,7 +106,7 @@ public class Member {
 
 ![img.png](img/img_2.png)
 
-### 지연 로딩
+## 지연 로딩
 
 ```java
 // Team
@@ -226,7 +225,7 @@ public class Member {
 
 그렇다면 JPQL로 Join문을 내가 직접 작성해주면 해결되지 않을까?
 
-### join문 직접 작성하기
+## join문 작성하기
 
 ```java
 @Query("select distinct t from Team t join t.memberList")
@@ -250,7 +249,10 @@ List<Team> findAllByJoin();
 
 이를 해결하기 위해 fetch join 전략을 사용해 보자.
 
-### Fetch join - 컬렉션 조회
+## Fetch join - 컬렉션 조회
+
+팀들을 조회하면서 연관된 멤버들의 정보까지 조회하는 쿼리를 작성하려 한다.
+
 ```java
 @Query("select t from Team t join fetch t.memberList")
 List<Team> findAllByFetchJoinWithoutDistinct();
@@ -262,9 +264,12 @@ List<Team> findAllByFetchJoinWithoutDistinct();
 
 당연히 일대다 관계인 Member를 조인하므로 그런 것이다. 이런 중복 데이터를 없애기 위해서는 SQL의 distinct로 해결하였다. 하지만 distinct의 경우 모든 칼럼의 값이 동일한 경우에 중복이 제거된다. 그러니 중복이 제거되지 않을 것이다.
 
-그러나 JPQL의 distinct는 1차적으로 쿼리에 distinct를 적용시키고 애플리케이션 단에서 2차적으로 한번 더 중복을 제거해준다.
+그러나 JPQL의 distinct는 기존 SQL의 distinct와 다르게 동작한다.
 
-아래와 같이 쿼리를 조금 수정하여 실행결과를 살펴보자
+> 1. SQL에 distinct를 추가
+> 2. 애플리케이션에서 엔티티 중복 제거
+
+따라서 쿼리를 조금 수정하여 실행결과를 살펴보자.
 
 ```java
 @Query("select distinct t from Team t join fetch t.memberList")
@@ -275,3 +280,33 @@ List<Team> findAllByFetchJoin();
 
 아래와 같이 teamA에 속한 5명, teamB에 속한 5명에 대한 총 10개의 이름이 출력되는 것을 확인할 수 있다. 따라서 fetch join을 통해 컬렉션을 조회하는 경우에는 distinct를 반드시 붙여줘야 한다.
 
+## Fetch join - 엔티티 조회
+
+이번엔 반대로 Member 정보를 조회하면서 팀을 조회하는 상황을 살펴볼 것이다.
+
+![img.png](img/img_8.png)
+
+member를 모두 조회한 후 이름 및 소속 팀명을 출력하도록 하였다. 
+
+쿼리문을 살퍄보면 Team의 경우 프록시 객체로 조회되어 team을 조회하는 지연 쿼리가 발생하고 있다. 
+
+그런데 쿼리가 총 두번 발생한다. 이는 최초 TeamA의 이름을 출력하기 위해 쿼리가 나간 후 TeamA는 1차 캐시에 저장된다. 따라서 이후 TeamA에 속한 member의 정보를 출력할 때에는 쿼리가 발생하지 않는다.
+
+그러다 TeamB의 이름을 출력해야 할 때 1차 캐시에 존재하지 않으므로 TeamB를 조회하는 쿼리가 발생한다.
+
+만약 회원의 수가 100명이고 팀이 모두 다르다면, 회원을 조회하고 소속 팀에 대한 정보를 필요로 하는 요청이 발생했을 때 팀을 조회하는 쿼리는 100번이 추가적으로 발생할 것이다. 즉 N + 1문제가 발생한다.
+
+이 시점에 fetch join을 사용하여 똑같이 모든 Member를 조회해 보자.
+
+아래와 같이 쿼리문을 작성하고 테스트 결과를 살펴보자.
+
+```java
+@Query("select m from Member m join fetch m.team")
+List<Member> findAllByFetchJoin();
+```
+
+![img.png](img/img_9.png)
+
+쿼리를 보면 member를 조회하면서 동시에 연관된 team 정보를 모두 조회하는 것을 알 수 있다.
+
+## Fetch join의 한계점

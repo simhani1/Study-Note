@@ -214,6 +214,72 @@ public class RepositoryTestV1 {
         System.out.println(teamList.get(0).getMemberList());
     }
 
+    @Test
+    public void 모든_member_조회() throws Exception {
+        // given
+        Team team = Team.builder()
+                .teamName("A")
+                .build();
+        Team team2 = Team.builder()
+                .teamName("B")
+                .build();
+
+        // when
+        Team savedTeam = teamRepository.save(team);
+        Team savedTeam2 = teamRepository.save(team2);
+        IntStream.range(0, 5)
+                .mapToObj(i -> Member.builder()
+                        .name("user" + i)
+                        .team(savedTeam)
+                        .build()).forEach(member -> memberRepository.save(member));
+        IntStream.range(0, 5)
+                .mapToObj(i -> Member.builder()
+                        .name("user" + i)
+                        .team(savedTeam2)
+                        .build()).forEach(member -> memberRepository.save(member));
+        flushAndClear();
+
+        // then
+        log.info("\n=============== memberRepository.findAll() =================");
+        List<Member> memberList = memberRepository.findAll();
+        memberList.forEach(
+                member -> System.out.println("memberName: " + member.getName() + " , teamName: " + member.getTeam().getTeamName())
+        );
+    }
+
+    @Test
+    public void fetch_join을_사용한_경우_모든_member_조회() throws Exception {
+        // given
+        Team team = Team.builder()
+                .teamName("A")
+                .build();
+        Team team2 = Team.builder()
+                .teamName("B")
+                .build();
+
+        // when
+        Team savedTeam = teamRepository.save(team);
+        Team savedTeam2 = teamRepository.save(team2);
+        IntStream.range(0, 5)
+                .mapToObj(i -> Member.builder()
+                        .name("user" + i)
+                        .team(savedTeam)
+                        .build()).forEach(member -> memberRepository.save(member));
+        IntStream.range(0, 5)
+                .mapToObj(i -> Member.builder()
+                        .name("user" + i)
+                        .team(savedTeam2)
+                        .build()).forEach(member -> memberRepository.save(member));
+        flushAndClear();
+
+        // then
+        log.info("\n=============== memberRepository.findAllByFetchJoin() =================");
+        List<Member> memberList = memberRepository.findAllByFetchJoin();
+        memberList.forEach(
+                member -> System.out.println("memberName: " + member.getName() + " , teamName: " + member.getTeam().getTeamName())
+        );
+    }
+
     private void flushAndClear() {
         em.flush();
         em.clear();
