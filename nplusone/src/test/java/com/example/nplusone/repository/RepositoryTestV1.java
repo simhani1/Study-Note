@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import javax.persistence.EntityManager;
@@ -23,7 +24,6 @@ public class RepositoryTestV1 {
 
     @Autowired
     private TeamRepository teamRepository;
-
     @Autowired
     private EntityManager em;
 
@@ -108,7 +108,7 @@ public class RepositoryTestV1 {
     }
 
     @Test
-    public void fetch_join_withou_distinct() throws Exception {
+    public void fetch_join_뻥튀기() throws Exception {
         // given
         Team team = Team.builder()
                 .teamName("A")
@@ -178,6 +178,49 @@ public class RepositoryTestV1 {
                     t.getMemberList()
                             .forEach(
                                     member -> System.out.println(member.getName())
+                            );
+                }
+        );
+    }
+
+    @Test
+    public void batchSize_페이징_처리() throws Exception {
+        // given
+        Team team = Team.builder()
+                .teamName("A")
+                .build();
+        Team team2 = Team.builder()
+                .teamName("B")
+                .build();
+        Team team3 = Team.builder()
+                .teamName("C")
+                .build();
+
+        // when
+        Team savedTeam = teamRepository.save(team);
+        Team savedTeam2 = teamRepository.save(team2);
+        Team savedTeam3 = teamRepository.save(team3);
+        IntStream.range(0, 5)
+                .mapToObj(i -> Member.builder()
+                        .name("user" + i)
+                        .team(savedTeam)
+                        .build()).forEach(member -> memberRepository.save(member));
+        IntStream.range(0, 5)
+                .mapToObj(i -> Member.builder()
+                        .name("user" + i)
+                        .team(savedTeam2)
+                        .build()).forEach(member -> memberRepository.save(member));
+        flushAndClear();
+
+        // then
+        log.info("\n=============== batchSize + 페이징 처리를 적용한 경우 findAll() =================");
+        PageRequest pageRequest = PageRequest.of(0, 2);
+        List<Team> teamList = teamRepository.findAllByWithPaging(pageRequest);
+        teamList.forEach(
+                t -> {
+                    t.getMemberList()
+                            .forEach(
+                                    member -> System.out.println("teamName: " + member.getTeam().getTeamName() + " , memberName: " + member.getName())
                             );
                 }
         );

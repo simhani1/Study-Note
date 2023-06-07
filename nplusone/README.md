@@ -310,3 +310,61 @@ List<Member> findAllByFetchJoin();
 쿼리를 보면 member를 조회하면서 동시에 연관된 team 정보를 모두 조회하는 것을 알 수 있다.
 
 ## Fetch join의 한계점
+
+1. **fetch join 대상에 별칭 지정 불가능**
+```sql
+select distinct t from Team t join fetch t.memberList ml where ml.username = 'user1' 
+```
+
+fetch joind은 join 대상을 모두 조회한다는 의미이다. 
+
+모든 엔티티를 조회하지 않고 일부만 조회하려는 행위는 위험하다.
+   
+2. **둘 이상의 컬렉션 fetch join 불가능**
+
+만약 조회하려는 컬렉션이 두 개 이상이라면 fetch join을 사용할 수 없다.
+
+3. **페이징 처리 불가능**
+
+fetch join은 연관된 모든 데이터를 조회하는 것이라고 앞서 말했다. 또한 데이터 조작을 방지하기 위해 별칭도 사용하지 못했다.
+ 
+일대일, 다대일 같은 경우에는 단일 엔티티를 fetch join하기 때문에 가능하다.
+
+하지만 컬렉션 조인의 경우 데이터 뻥튀기가 발생하고 페이징 처리를 하는 경우 온전한 데이터가 조회된다고 볼 수 없고 하이버네이트는 에러를 발생시킨다.
+
+페이징 처리를 위해서는 다대일 조인 쿼리문을 일대다 조인 쿼리로 바꿔서 조회하거나 BatchSize를 설정하는 방법이 있다.
+
+페이징 처리를 만약 한다면 애플리케이션 단에서 페이징 처리를 해서 보여준다. 따라서 fetch join 시 페이징 처리는 절대로 하지 말아야 한다.   
+
+**다대일 fetch join**
+```sql
+select m from Member m join fetch m.team
+```
+
+## BatchSize
+```java
+@BatchSize(size = 100)
+@OneToMany(mappedBy = "team", fetch = FetchType.LAZY))
+List<Member> memberList = new ArrayList<>(); 
+```
+batchSize 옵션은 지정한 size 만큼 연관 데이터를 한번에 미리 조회하는 것이다. 
+
+따라서 페이징 처리가 가능하고 N + 1 문제도 해결할 수 있다. 
+
+아래와 같이 BatchSize를 지정하고 페이징 처리를 적용했을 때 결과를 보자.
+
+![img.png](img/img_10.png)
+
+쿼리문을 살펴보면 team에 대하여 페이징 처리가 적용되었고 그 개수에 맞는 member 컬렉션을 조회하는 것을 볼 수 있다.
+
+따라서 문제가 제대로 해결되었다. 보통 실무에선 batchSize를 1000이하로 설정하여 사용한다고 한다.
+
+## 정리
+- `ToOne` 으로 끝나는 관계의 경우 반드시 `LAZY 로딩 전략` 선택하기
+- 지연 쿼리로 인한 성능 저하를 막기 위해 `fetch join` 사용하기
+  - 일대다 관계에서 컬렉션을 조회하는 경우 `별칭 설정 불가`
+  - 페이징 처리 불가
+  - 데이터 뻥튀기 주의 -> `distinct` 로 해결
+  - 두 개 이상의 컬렉션을 동시에 fetch join하지 않기
+- 페이징 처리와 fetch join을 사용해야 한다면?
+  - `BatchSize` 설정하여 원하는 수 만큼 연관 데이터 미리 조회하기

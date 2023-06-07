@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.BatchSize;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -21,6 +22,7 @@ public class Team {
     @Column(nullable = false)
     private String teamName;
 
+    @BatchSize(size = 100)
     @OneToMany(mappedBy = "team", fetch = FetchType.LAZY)
     private List<Member> memberList = new ArrayList<>();
 

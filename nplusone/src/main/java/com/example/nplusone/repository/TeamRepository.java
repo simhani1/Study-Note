@@ -1,6 +1,7 @@
 package com.example.nplusone.repository;
 
 import com.example.nplusone.domain.Team;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -10,6 +11,9 @@ public interface TeamRepository extends JpaRepository<Team, Long> {
 
     @Query("select distinct t from Team t join fetch t.memberList")
     List<Team> findAllByFetchJoin();
+
+    @Query("select t from Team t")
+    List<Team> findAllByWithPaging(PageRequest pageRequest);
 
     @Query("select t from Team t join fetch t.memberList")
     List<Team> findAllByFetchJoinWithoutDistinct();
