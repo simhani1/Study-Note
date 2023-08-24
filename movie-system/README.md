@@ -212,3 +212,114 @@ public class ReservationAgency {
 
 ![img.png](img/img.png)
 
+### ⛔️ 여전히 존재하는 문제점들
+
+지금까지 데이터에 대한 오퍼레이션을 객체 내부로 이동시키면서 캡슐화가 된 것처럼 보이지만 사실 여전히 문제가 존재한다.
+
+- DiscountCondition
+
+```java
+    public boolean isDiscountable(DayOfWeek dayOfWeek, LocalTime time) {
+        if (type != DiscountConditionType.PERIOD) {
+            throw new IllegalArgumentException();
+        }
+        return this.dayOfWeek.equals(dayOfWeek) &&
+            this.startTime.compareTo(time) <= 0 &&
+            this.endTime.compareTo(time) >= 0;
+    }
+
+    public boolean isDiscountable(int sequence) {
+        if (type != DiscountConditionType.SEQUENCE) {
+            throw new IllegalArgumentException();
+        }
+        return this.sequence == sequence;
+    }
+```
+
+첫번째 `isDiscountable` 메서드는 인자로 `dayOfWeek`, `time`을 전달받고 있고 이는 외부로 `DiscountCondition`클래스의 속성을 노출시키고 있는 것과 다름없는 것이다.
+또한 두번째 메서드는 인자로 `sequence`를 전달받고 있다.
+
+두 메서드 모두 외부로 객체 내부의 속성을 노출시키고 있다. 만약 객체 내부의 속성을 변경한다면 해당 메서드를 사용하는 모든 클라이언트의 메서드에도 인자를 수정해야 할 것이다.
+객체가 스스로 데이터를 처리한다는 점에서 이전보다 개선되었지만 내부 구현을 완전히 캡슐화하지는 못했다.
+
+- Movie
+
+```java
+    public Money calculateAmountDiscountFee() {
+        if (movieType != MovieType.AMOUNT_DISCOUNT) {
+            throw new IllegalArgumentException();
+        }
+        return fee.minus(discountAmount);
+    }
+
+    public Money calculatePercentDiscountFee() {
+        if (movieType != MovieType.PERCENT_DISCOUNT) {
+            throw new IllegalArgumentException();
+        }
+        return fee.minus(fee.times(discountPercent));
+    }
+
+    public Money calculateNoneDiscountFee() {
+        if (movieType != MovieType.NONE_DISCOUNT) {
+            throw new IllegalArgumentException();
+        }
+        return fee;
+    }
+```
+
+다음 세 가지 메서드를 보면 할인 방법은 총 3가지가 있음을 쉽게 파악할 수 있다. 그리고 만약 새로운 할인 정책이 추가되거나 기존 정책이 수정된다면 클라이언트의 메서드에서도 반드시 변경의 파급효과에 영향을 받게된다.
+즉 내부 구현을 완전히 캡슐화 하지 못한 것이다.
+
+```java
+    public boolean isDiscountable(LocalDateTime whenScreened, int sequence) {
+        for (DiscountCondition condition : discountConditions) {
+            if (condition.getType() == DiscountConditionType.PERIOD) {
+                if (condition.isDiscountable(whenScreened.getDayOfWeek(), whenScreened.toLocalTime())) {
+                    return true;
+                }
+            } else {
+                if (condition.isDiscountable(sequence)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+```
+
+위 메서드에도 문제가 있다.
+
+`Movie` 객체의 `discountConditions` 목록을 돌며 할인 조건에 따라 적합한 메서드를 호출하고 있다.
+만약 할인 조건의 타입이 `PERIOD`에서 다른 타입으로 변경된다면 코드에 수정이 발생한다.
+또한 조건에 따라 호출하는 메서드의 인자도 모두 달리지므로 할인 조건을 임의로 변경하기가 어렵다는 것을 쉽게 느낄 수 있다.
+
+- Screening
+
+```java
+    public Money calculateFee(int audienceCount) {
+        switch (movie.getMovieType()) {
+            case AMOUNT_DISCOUNT:
+                if (movie.isDiscountable(whenScreened, sequence)) {
+                    return movie.calculateAmountDiscountFee().times(audienceCount);
+                }
+                break;
+            case PERCENT_DISCOUNT:
+                if (movie.isDiscountable(whenScreened, sequence)) {
+                    return movie.calculatePercentDiscountFee().times(audienceCount);
+                }
+                break;
+            case NONE_DISCOUNT:
+                return movie.calculateNoneDiscountFee().times(audienceCount);
+        }
+        return movie.calculateNoneDiscountFee().times(audienceCount);
+    }
+```
+
+앞서 말한 DiscountCondition이 추가되거나 변경된다면 조건문이 변경돼야 한다.
+
+**총정리를 하자면 DiscountCondition을 추가하거나 변경한다면 Movie, Screening 객체 모두 영향을 받아 수정이 발생한다. 이는 여전히 높은 결합도, 낮은 응집도를 지니고 있기 때문이다.**
+
+
+### 👉 캡슐화의 진정한 의미
+
+캡슐화는 변할 수 있는 모든 것을 감추는 행위를 의미한다. 내부 구현의 변경으로 외부의 객체가 영향을 받는다면 이는 완전한 캡슐화가 되지 못한다는 것을 의미한다.
