@@ -146,4 +146,25 @@ public class ReservationAgency {
     }
 ```
 
+- Movie
+
+영화의 할인 조건에 따라 할인 가능 여부를 확인하는 책임을 Movie 클래스에 위임한다.
+
+```java
+    public boolean isDiscountable(LocalDateTime whenScreened, int sequence) {
+        for (DiscountCondition condition : discountConditions) {
+            if (condition.getType() == DiscountConditionType.PERIOD) {
+                if (condition.isDiscountable(whenScreened.getDayOfWeek(), whenScreened.toLocalTime())) {
+                    return true;
+                }
+            } else {
+                if (condition.isDiscountable(sequence)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+```
+
 
