@@ -1,4 +1,11 @@
-package com.theater.movie;
+package com.theater.reservation;
+
+import com.theater.customer.Customer;
+import com.theater.money.Money;
+import com.theater.movie.DiscountCondition;
+import com.theater.movie.DiscountConditionType;
+import com.theater.movie.Movie;
+import com.theater.screening.Screening;
 
 public class ReservationAgency {
 

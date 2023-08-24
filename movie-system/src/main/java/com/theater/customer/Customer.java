@@ -1,4 +1,4 @@
-package com.theater.movie;
+package com.theater.customer;
 
 import lombok.Getter;
 import lombok.Setter;

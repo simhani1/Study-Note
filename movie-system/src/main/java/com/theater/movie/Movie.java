@@ -1,5 +1,6 @@
 package com.theater.movie;
 
+import com.theater.money.Money;
 import lombok.Getter;
 import lombok.Setter;
 

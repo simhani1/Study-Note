@@ -1,4 +1,4 @@
-package com.theater.movie;
+package com.theater.money;
 
 import java.math.BigDecimal;
 

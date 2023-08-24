@@ -1,5 +1,6 @@
-package com.theater.movie;
+package com.theater.screening;
 
+import com.theater.movie.Movie;
 import lombok.Getter;
 import lombok.Setter;
 

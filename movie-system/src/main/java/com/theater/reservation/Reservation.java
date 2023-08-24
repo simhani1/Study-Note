@@ -1,5 +1,8 @@
-package com.theater.movie;
+package com.theater.reservation;
 
+import com.theater.customer.Customer;
+import com.theater.money.Money;
+import com.theater.screening.Screening;
 import lombok.Getter;
 import lombok.Setter;
 
