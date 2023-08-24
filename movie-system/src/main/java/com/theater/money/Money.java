@@ -12,7 +12,7 @@ public class Money {
         return new Money(BigDecimal.valueOf(amount));
     }
 
-    public static Money wone(double amount) {
+    public static Money wons(double amount) {
         return new Money(BigDecimal.valueOf(amount));
     }
 
