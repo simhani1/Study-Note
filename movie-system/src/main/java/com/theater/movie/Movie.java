@@ -1,6 +1,7 @@
 package com.theater.movie;
 
 import com.theater.money.Money;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,6 +10,7 @@ import java.util.List;
 
 @Getter
 @Setter
+@Builder
 public class Movie {
 
     private String title;
