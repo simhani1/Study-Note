@@ -120,3 +120,30 @@ public class ReservationAgency {
 
 ### 👉 스스로 자신의 데이터를 책임지는 객체
 
+- DiscountCondition
+
+순번 할인을 적용하기 위해서는 sequence, 기간 할인을 적용하기 위해서는 dayOfWeek, time값이 필요하다.
+이 값들은 모두 DiscountCondition 객체가 가지고 있는 데이터이다.
+따라서 할인 조건을 만족하는지 검사하는 메서드를 DiscountCondition 클래스로 이동시키자.
+
+```java
+    public boolean isDiscountable(DayOfWeek dayOfWeek, LocalTime time) {
+        if (type != DiscountConditionType.PERIOD) {
+            throw new IllegalArgumentException();
+        }
+
+        return this.dayOfWeek.equals(dayOfWeek) &&
+                this.startTime.compareTo(time) <= 0 &&
+                this.endTime.compareTo(time) >= 0;
+    }
+
+    public boolean isDiscountable(int sequence) {
+        if (type != DiscountConditionType.SEQUENCE) {
+            throw new IllegalArgumentException();
+        }
+
+        return this.sequence == sequence;
+    }
+```
+
+
