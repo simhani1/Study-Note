@@ -10,7 +10,7 @@ import java.time.LocalTime;
 @Setter
 public class DiscountCondition {
 
-    private DiscountConditionType discountConditionType;
+    private DiscountConditionType type;
 
     private int sequence;
 
