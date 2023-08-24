@@ -1,7 +1,12 @@
 package com.theater.money;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.math.BigDecimal;
 
+@Getter
+@Setter
 public class Money {
 
     public static final Money ZERO = Money.wons(0);
