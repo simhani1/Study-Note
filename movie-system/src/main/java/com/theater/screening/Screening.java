@@ -2,6 +2,7 @@ package com.theater.screening;
 
 import com.theater.money.Money;
 import com.theater.movie.Movie;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,17 +10,12 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
+@Builder
 public class Screening {
 
     private Movie movie;
     private int sequence;
     private LocalDateTime whenScreened;
-
-    public Screening(Movie movie, int sequence, LocalDateTime whenScreened) {
-        this.movie = movie;
-        this.sequence = sequence;
-        this.whenScreened = whenScreened;
-    }
 
     public Money calculateFee(int audienceCount) {
         switch (movie.getMovieType()) {
