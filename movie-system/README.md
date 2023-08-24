@@ -99,15 +99,18 @@ public class ReservationAgency {
 ```
 
 위 코드는 할인이 가능하다면 영화의 타입에 따라 적절한 할인 정책에 따라 가격에 할인이 되는 로직이다.
-여기서도 `Movie` 클래스 내부에는 `fee`라는 필드가 존재함을 알 수 있다. 마찬가지로 이는 캡슐화가 제대로 되어 있지 않음을 의미한다. 만약 fee가 아닌 다른 변수를 사용한다면? `getFee()` 메서드를 사용하는 모든 클래스의 코드에는 수정이 불가피하다.
-`getFee()` 메서드 하나로 인해 Movie 클래스 내부를 마음대로 변경하기 부담스러운 상황이다.
-또한 변경에 매우 취약하다.
+
+여기서도 `Movie` 클래스 내부에는 `fee`라는 필드가 존재함을 알 수 있다. 
+
+마찬가지로 이는 캡슐화가 제대로 되어 있지 않음을 의미한다. 만약 fee가 아닌 다른 변수를 사용한다면? `getFee()` 메서드를 사용하는 모든 클래스의 코드에는 수정이 불가피하다.
+`getFee()` 메서드 하나로 인해 Movie 클래스 내부를 마음대로 변경하기 부담스러운 상황이다. 또한 변경에 매우 취약하다.
 할인 정책은 변경 가능성이 매우 높다. 그러나 위 코드에서는 할인 조건에 따라 다른 할인을 적용하기 위해 조건문을 사용하고 있다.
 할인 조건을 추가한다면 우리는 `ReservationAgency` 클래스의 코드를 반드시 수정할 수 밖에 없다.
+
+
 즉 변경이 힘든 코드로 인해 할인정책을 마음대로 추가하거나 삭제할 수 없는 상황이다.
 
-이 모든 문제점들은 캠슐화가 제대로 안되어 있기 때문이고, 그로 인해 응집도는 낮아지고 결합도는 높은 상태가 된 것이다.
- 
+이 모든 문제점들은 캠슐화가 제대로 안되어 있기 때문이고, 그로 인해 응집도는 낮아지고 결합도는 높은 상태가 된 것이다. 
 지금부터는 캡슐화 원칙을 지키며 변경에 용이하도록 코드를 변경해 볼 것이다.
 
 ## 책임 주도 설계
@@ -148,7 +151,7 @@ public class ReservationAgency {
 
 - Movie
 
-영화의 할인 조건에 따라 할인 가능 여부를 확인하는 책임을 Movie 클래스에 위임한다.
+영화의 할인 조건에 따라 할인 가능 여부를 확인하는 책임을 `Movie` 클래스에 위임한다.
 
 ```java
     public boolean isDiscountable(LocalDateTime whenScreened, int sequence) {
@@ -167,4 +170,45 @@ public class ReservationAgency {
     }
 ```
 
+- Screening
+
+```java
+    public Money calculateFee(int audienceCount) {
+        switch (movie.getMovieType()) {
+            case AMOUNT_DISCOUNT:
+                if (movie.isDiscountable(whenScreened, sequence)) {
+                    return movie.calculateAmountDiscountFee().times(audienceCount);
+                }
+                break;
+            case PERCENT_DISCOUNT:
+                if (movie.isDiscountable(whenScreened, sequence)) {
+                    return movie.calculatePercentDiscountFee().times(audienceCount);
+                }
+                break;
+            case NONE_DISCOUNT:
+                return movie.calculateNoneDiscountFee().times(audienceCount);
+        }
+        return movie.calculateNoneDiscountFee().times(audienceCount);
+    }
+```
+
+영화의 타입에 따라 적절한 할인 방법을 적용시킬 수 있는지 검사하고 최종적으로 할인된 금액을 계산한다.
+
+처음 코드와 다르게 각 객체가 수행해야 하는 오퍼레이션을 가지게 되었다. 최종적으로 `ReservationAgency`클래스의 코드는 아래와 같이 줄어들었다.
+
+- ReservationAgency
+
+```java
+public class ReservationAgency {
+
+    public Reservation reserve(Screening screening, Customer customer, int audienceCount) {
+        Money fee = screening.calculateFee(audienceCount);
+        return new Reservation(customer, screening, fee, audienceCount);
+    }
+}
+```
+
+테스트 코드를 통해 예매 기능이 제대로 동작하고 있음을 확인할 수 있다.
+
+![img.png](img/img.png)
 

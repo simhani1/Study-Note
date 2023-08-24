@@ -57,7 +57,6 @@ class ReservationAgencyTest {
         assertThat(reserveation.getCustomer()).isEqualTo(customer);
         assertThat(reserveation.getScreening()).isEqualTo(screening);
         assertThat(reserveation.getAudienceCount()).isEqualTo(audienceCount);
-        assertThat(reserveation.getFee().getAmount().intValue()).isEqualTo(9000);
+        assertThat(reserveation.getFee().getAmount().intValue()).isEqualTo(2 * 9000);
     }
-
 }
