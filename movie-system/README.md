@@ -474,3 +474,67 @@ Movie 객체는 타입에 따라 적절한 할인 금액을 계산하여 반환�
 
 ### DiscountCondition에 여전히 존재하는 문제점
 
+- 할인 조건을 조건문을 통해 검사하고 있다.
+- 할인 조건에 따라 필요로 하는 데이터를 속성으로 가지고 있다.
+
+즉 새로운 할인 조건이 추가된다면 조건문, 할인 여부 판단을 위한 새로운 데이터들이 새롭게 추가된다.
+
+하나 이상의 변경 이유를 가지고 있으므로 응집도가 낮은 상태다.
+이를 해결하기 위해 **변경의 이유에 따라 클래스를 분리해야 한다**
+
+### 👉 변경의 이유를 파악하는 방법
+
+1. 인스턴스 변수가 초기화되는 시점을 관찰한다.
+인스턴스 변수가 초기화되는 시점을 살펴보자. 응집도가 낮은 클래스는 인스턴스가 생성되는 시점에 속성의 일부만 초기화한다.
+따라서 인스턴스와 함께 초기화되는 속성을 기준으로 코드를 분리해야 한다.
+
+2. 메서드가 인스턴스 변수를 사용하는 방식을 관찰한다.
+
+메서드들이 사용하는 속성에 따라 그룹이 나뉜다면 클래스의 응집도가 낮다고 판단할 수 있다.
+따라서 속성 그룹과 해당 그룹에 접근하는 메서드를 기준으로 코드를 분리시켜야 한다.
+
+- DiscountCondition 분리(PeriodCondition, SequenceCondition) - POLYMORPHISM 패턴
+
+다형성을 활용하여 DiscountCondition 인터페이스를 선언한다.
+
+```java
+public interface DiscountCondition {
+    
+    boolean isSatisfiedBy(Screening screening);
+}
+```
+
+그리고 기간, 순서 할인 조건 객체를 따로 구현한다.
+
+- PeriodCondition
+
+```java
+public class PeriodCondition implements DiscountCondition {
+
+    private DayOfWeek dayOfWeek;
+    private LocalTime startTime;
+    private LocalTime endTime;
+
+    @Override
+    public boolean isSatisfiedBy(Screening screening) {
+        return dayOfWeek.equals(screening.getWhenScreened().getDayOfWeek()) &&
+                startTime.compareTo(screening.getWhenScreened().toLocalTime()) <= 0 &&
+                endTime.compareTo(screening.getWhenScreened().toLocalTime()) >= 0;
+    }
+}
+```
+
+- SequenceCondition
+
+```java
+public class SequenceCondition implements DiscountCondition {
+
+    private int sequence;
+
+    @Override
+    public boolean isSatisfiedBy(Screening screening) {
+        return sequence == screening.getSequence();
+    }
+}
+```
+

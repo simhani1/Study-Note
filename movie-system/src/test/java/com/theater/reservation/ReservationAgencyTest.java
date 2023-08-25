@@ -2,10 +2,9 @@ package com.theater.reservation;
 
 import com.theater.customer.Customer;
 import com.theater.money.Money;
-import com.theater.movie.DiscountCondition;
-import com.theater.movie.DiscountConditionType;
 import com.theater.movie.Movie;
 import com.theater.movie.MovieType;
+import com.theater.movie.discount.PeriodCondition;
 import com.theater.screening.Screening;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -31,12 +30,10 @@ class ReservationAgencyTest {
                         .fee(Money.wons(10000))
                         .discountAmount(Money.wons(1000))
                         .discountPercent(0.0)
-                        .discountConditions(List.of(DiscountCondition.builder()
+                        .discountConditions(List.of(PeriodCondition.builder()
                                 .dayOfWeek(DayOfWeek.FRIDAY)
-                                .sequence(1)
                                 .startTime(LocalTime.of(1, 20))
                                 .endTime(LocalTime.of(2, 30))
-                                .type(DiscountConditionType.SEQUENCE)
                                 .build()))
                         .movieType(MovieType.AMOUNT_DISCOUNT)
                         .build())
