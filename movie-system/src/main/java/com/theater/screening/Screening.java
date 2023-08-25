@@ -19,24 +19,6 @@ public class Screening {
     private int sequence;
     private LocalDateTime whenScreened;
 
-//    public Money calculateFee(int audienceCount) {
-//        switch (movie.getMovieType()) {
-//            case AMOUNT_DISCOUNT:
-//                if (movie.isDiscountable(whenScreened, sequence)) {
-//                    return movie.calculateAmountDiscountFee().times(audienceCount);
-//                }
-//                break;
-//            case PERCENT_DISCOUNT:
-//                if (movie.isDiscountable(whenScreened, sequence)) {
-//                    return movie.calculatePercentDiscountFee().times(audienceCount);
-//                }
-//                break;
-//            case NONE_DISCOUNT:
-//                return movie.calculateNoneDiscountFee().times(audienceCount);
-//        }
-//        return movie.calculateNoneDiscountFee().times(audienceCount);
-//    }
-
     public Reservation reserve(Customer customer, int audienceCount) {
         return Reservation.builder()
                 .customer(customer)

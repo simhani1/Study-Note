@@ -538,3 +538,13 @@ public class SequenceCondition implements DiscountCondition {
 }
 ```
 
+- Movie
+
+```java
+    private boolean isDiscountable(Screening screening) {
+        return discountConditions.stream()
+                .anyMatch(condition -> condition.isSatisfiedBy(screening));
+    }
+```
+
+다형성을 사용하여 할인 정책을 저장하기 때문에 할인 정책이 추가되더라도 Movie 객체는 영향을 받지 않게 코드가 개선되었다.

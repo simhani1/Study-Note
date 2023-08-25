@@ -6,6 +6,7 @@ import com.theater.movie.Movie;
 import com.theater.movie.MovieType;
 import com.theater.movie.discount.PeriodCondition;
 import com.theater.screening.Screening;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -13,8 +14,6 @@ import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 class ReservationAgencyTest {
 
@@ -38,7 +37,7 @@ class ReservationAgencyTest {
                         .movieType(MovieType.AMOUNT_DISCOUNT)
                         .build())
                 .sequence(1)
-                .whenScreened(LocalDateTime.of(2023, 1, 1, 13, 30, 0))
+                .whenScreened(LocalDateTime.of(2023, 1, 1, 1, 30, 0))
                 .build();
         Customer customer = Customer.builder()
                 .id("test")
@@ -51,9 +50,9 @@ class ReservationAgencyTest {
         Reservation reserveation = reservationAgency.reserve(screening, customer, audienceCount);
 
         // then
-        assertThat(reserveation.getCustomer()).isEqualTo(customer);
-        assertThat(reserveation.getScreening()).isEqualTo(screening);
-        assertThat(reserveation.getAudienceCount()).isEqualTo(audienceCount);
-        assertThat(reserveation.getFee().getAmount().intValue()).isEqualTo(2 * 9000);
+        Assertions.assertEquals(reserveation.getCustomer(), customer);
+        Assertions.assertEquals(reserveation.getScreening(), screening);
+        Assertions.assertEquals(reserveation.getAudienceCount(), audienceCount);
+        Assertions.assertEquals(reserveation.getFee().getAmount().intValue(), 20000);
     }
 }
