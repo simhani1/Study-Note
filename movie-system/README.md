@@ -406,5 +406,49 @@ calculateFee 메서드를 살펴보면 movie에게 영화의 금액을 계산하
 
 수신하는 메시지를 구현한다.
 
+Movie 객체는 타입에 따라 적절한 할인 금액을 계산하여 반환한다.
 
+```java
+    public Money calculateMovieFee(Screening screening) {
+        if (isDiscountable(screening)) {
+            return fee.minus(calculateDiscountAmount());
+        }
+        
+        return fee;
+    }
+
+    private boolean isDiscountable(Screening screening) {
+        return discountConditions.stream()
+                .anyMatch(condition -> condition.isDiscountable(screening));
+    }
+    
+    private Money calculateDiscountAmount() {
+        switch (movieType) {
+            case AMOUNT_DISCOUNT:
+                return calculateAmountDiscountAmount();
+            case PERCENT_DISCOUNT:
+                return calculatePercentDiscountAmount();
+            case NONE_DISCOUNT:
+                return calculateNoneDiscountAmount();
+        }
+        throw new IllegalArgumentException();
+    }
+
+    private Money calculateAmountDiscountAmount() {
+        return discountAmount;
+    }
+    
+    private Money calculatePercentDiscountAmount() {
+        return fee.times(discountPercent);
+    }
+    
+    private Money calculateNoneDiscountAmount() {
+        return Money.ZERO;
+    }
+```
+
+- DiscountCondition
+
+`Movie`는 할인 여부를 판단하라는 메시지를 전송하고 있다. 따라서 `DiscountCondition`객체는 수신받는 메시지를 처리하도록 `isSatisfied()` 메서드를 구현해야 한다.
+ 
 
