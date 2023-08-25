@@ -451,4 +451,26 @@ Movie 객체는 타입에 따라 적절한 할인 금액을 계산하여 반환�
 
 `Movie`는 할인 여부를 판단하라는 메시지를 전송하고 있다. 따라서 `DiscountCondition`객체는 수신받는 메시지를 처리하도록 `isSatisfied()` 메서드를 구현해야 한다.
  
+```java
+    public boolean isSatisfiedBy(Screening screening) {
+        if (type == DiscountConditionType.PERIOD) {
+            return isSatisfiedByPeriod(screening);
+        }
+        return isSatisfiedBySequence(screening);
+    }
+
+    private boolean isSatisfiedByPeriod(Screening screening) {
+        return dayOfWeek.equals(screening.getWhenScreened().getDayOfWeek()) &&
+                startTime.compareTo(screening.getWhenScreened().toLocalTime()) <= 0 &&
+                endTime.compareTo(screening.getWhenScreened().toLocalTime()) >= 0;
+    }
+
+    private boolean isSatisfiedBySequence(Screening screening) {
+        return sequence == screening.getSequence();
+    }
+```
+
+할인 타입에 따라 할인을 적용시킬 수 있는지 판단하는 메서드를 구현한다.
+
+### DiscountCondition에 여전히 존재하는 문제점
 

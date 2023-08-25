@@ -67,7 +67,7 @@ public class Movie {
 
     private boolean isDiscountable(Screening screening) {
         return discountConditions.stream()
-                .anyMatch(condition -> condition.isSatisfied(screening));
+                .anyMatch(condition -> condition.isSatisfiedBy(screening));
     }
 
     private Money calculateDiscountAmount() {

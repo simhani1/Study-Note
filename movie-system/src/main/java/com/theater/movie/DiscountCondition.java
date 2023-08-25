@@ -1,5 +1,6 @@
 package com.theater.movie;
 
+import com.theater.screening.Screening;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,21 +21,38 @@ public class DiscountCondition {
     private LocalTime startTime;
     private LocalTime endTime;
 
-    public boolean isDiscountable(DayOfWeek dayOfWeek, LocalTime time) {
-        if (type != DiscountConditionType.PERIOD) {
-            throw new IllegalArgumentException();
-        }
+//    public boolean isDiscountable(DayOfWeek dayOfWeek, LocalTime time) {
+//        if (type != DiscountConditionType.PERIOD) {
+//            throw new IllegalArgumentException();
+//        }
+//
+//        return this.dayOfWeek.equals(dayOfWeek) &&
+//                this.startTime.compareTo(time) <= 0 &&
+//                this.endTime.compareTo(time) >= 0;
+//    }
+//
+//    public boolean isDiscountable(int sequence) {
+//        if (type != DiscountConditionType.SEQUENCE) {
+//            throw new IllegalArgumentException();
+//        }
+//
+//        return this.sequence == sequence;
+//    }
 
-        return this.dayOfWeek.equals(dayOfWeek) &&
-                this.startTime.compareTo(time) <= 0 &&
-                this.endTime.compareTo(time) >= 0;
+    public boolean isSatisfiedBy(Screening screening) {
+        if (type == DiscountConditionType.PERIOD) {
+            return isSatisfiedByPeriod(screening);
+        }
+        return isSatisfiedBySequence(screening);
     }
 
-    public boolean isDiscountable(int sequence) {
-        if (type != DiscountConditionType.SEQUENCE) {
-            throw new IllegalArgumentException();
-        }
+    private boolean isSatisfiedByPeriod(Screening screening) {
+        return dayOfWeek.equals(screening.getWhenScreened().getDayOfWeek()) &&
+                startTime.compareTo(screening.getWhenScreened().toLocalTime()) <= 0 &&
+                endTime.compareTo(screening.getWhenScreened().toLocalTime()) >= 0;
+    }
 
-        return this.sequence == sequence;
+    private boolean isSatisfiedBySequence(Screening screening) {
+        return sequence == screening.getSequence();
     }
 }
