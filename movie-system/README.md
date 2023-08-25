@@ -355,7 +355,7 @@ public class ReservationAgency {
     - 협력을 위한 메시지를 선언한다.
     - 이때 메시지의 수신자를 고려하지 않고 송신자의 관점에서 필요한 메시지를 작성해야 캡슐화와 높은 결합도 목표를 달성하기 쉬워진다.
 
-### 변경 위험 징후를 드러내는 패턴
+### 👉 변경 위험 징후를 드러내는 패턴
 1. 인스턴스 변수가 초기화되는 시점을 살펴보자.
     - 응집도가 높은 클래스는 인스턴스를 생성할 때 모든 속성을 함께 초기화한다.
     - 클래스의 속성이 서로 다른 시점에 초기화되거나 일부만 초기화된다는 것은 응집도가 낮다는 것을 의미한다.
@@ -367,14 +367,44 @@ public class ReservationAgency {
     - 역할을 사용하여 객체의 구체적인 타입을 추상화할 수 있다.
     - 즉 객체의 암시적인 타입에 따라 행동을 분기해야 한다면 암시적인 타입을 명시적인 클래스로 정의하여 응집도 문제를 해결할 수 있다. -> POLYMORPHISM 패턴
 
-### 책임 주도 설계의 대안 -> 리팩토링
+### 👉 책임 주도 설계의 대안 -> 리팩토링
 - 책임 주도 설계에 익숙해지기 위해서는 내공이 필요하다.
 - 이로 인해 어려움을 겪고 있을 때 해결책은 일단 구현하고 리팩토링을 하는 방법이 있다.
 
-### 메서드를 쪼개자
+### 👉 메서드를 쪼개자
 - 긴 메서드들은 내부에서 어떤 일이 벌어지는지 판단하기 어렵고 수정에 용이하지 못하다.
 - 이를 개선하기 위해서는 메서드를 분리시켜야 한다.
 - 잘 쪼개진 메서드들을 보면 마치 주석을 읽는 느낌을 줄 수 있다.
 
-### 객체를 자율적으로 만들자
+### 👉 객체를 자율적으로 만들자
 - 자신이 소유하고 있는 데이터를 자기 스스르 처리하도록 만드는 것이 자율적인 객체를 만드는 지름길이다.
+
+### 구현을 통한 검증
+
+- Screening - 영화를 예매할 책임이 있다. 예매에 대한 정보 전문가이자 Reservation의 창조자이다.
+
+```java
+    public Reservation reserve(Customer customer, int audienceCount) {
+        return Reservation.builder()
+            .customer(customer)
+            .screening(this)
+            .fee(calculateFee(audienceCount))
+            .audienceCount(audienceCount)
+            .build();
+    }
+
+    private Money calculateFee(int audienceCount) {
+        return movie.calculateMovieFee(this).times(audienceCount);
+    }
+```
+
+calculateFee 메서드를 살펴보면 movie에게 영화의 금액을 계산하라는 메시지를 전송하고 있다. 중요한 점은 Movie의 내부 구현을 신경쓰지 않은 상태로 메시지를 전송하고 있다는 점이다.
+
+이렇게 메시지의 수신자를 고려하지 않고 송신자의 의도에 맞게 코드를 작성하면 캡슐화를 성공적으로 할 수 있다.
+
+- Movie
+
+수신하는 메시지를 구현한다.
+
+
+
