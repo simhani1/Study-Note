@@ -1,4 +1,4 @@
-package com.demo.architecture.order.repository.entity;
+package com.demo.architecture.order.domain;
 
 public enum OrderStatus {
 

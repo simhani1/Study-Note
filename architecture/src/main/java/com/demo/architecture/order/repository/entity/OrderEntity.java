@@ -10,11 +10,12 @@ import java.util.List;
 
 @Entity
 @Getter
+@Table(name = "ORDER_INFO")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class OrderEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue
     @Column(name = "order_id", nullable = false)
     private Long id;
 
@@ -22,10 +23,12 @@ public class OrderEntity {
     private Long ordererId;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "orderEntity")
-    @Column(name = "orderer_id", nullable = false)
     private List<OrderedProductEntity> orderedProductEntities = new ArrayList<>();
+
+    @Column(name = "total_price", nullable = false)
+    private int totalPrice;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "order_status", nullable = false)
-    private OrderStatus orderStatus;
+    private OrderStatusEntity orderStatusEntity;
 }
