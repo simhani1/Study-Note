@@ -1,10 +1,7 @@
 package com.demo.architecture.order.domain;
 
-import com.demo.architecture.order.repository.entity.OrderedProductEntity;
-import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
