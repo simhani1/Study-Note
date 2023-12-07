@@ -1,4 +1,4 @@
-package com.demo.architecture.order.service.command;
+package com.demo.architecture.product.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -7,8 +7,7 @@ import lombok.Getter;
 @Getter
 @Builder
 @AllArgsConstructor
-public class PurchaseProductCommand {
+public class ProductId {
 
-    private Long memberId;
     private Long productId;
 }
