@@ -7,7 +7,7 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 @Builder
-public class StartSaleProductWebRes {
+public class StartSalesProductWebRes {
 
     private String message;
 }

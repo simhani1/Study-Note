@@ -7,7 +7,7 @@ import lombok.Getter;
 @Getter
 @Builder
 @AllArgsConstructor
-public class StartSaleProductCommand {
+public class StartSalesProductCommand {
 
     private Long productId;
 }

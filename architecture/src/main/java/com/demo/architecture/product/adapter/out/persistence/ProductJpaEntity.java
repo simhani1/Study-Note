@@ -1,14 +1,17 @@
 package com.demo.architecture.product.adapter.out.persistence;
 
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
 @Getter
 @Entity
 @Table(name = "PRODUCT")
-public class ProductJpaEntity {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+class ProductJpaEntity {
 
     @Id
     @GeneratedValue

@@ -1,7 +1,5 @@
-package com.demo.architecture.product.adapter.out.mapper;
+package com.demo.architecture.product.adapter.out.persistence;
 
-import com.demo.architecture.product.adapter.out.persistence.ProductJpaEntity;
-import com.demo.architecture.product.adapter.out.persistence.SalesStatusJpa;
 import com.demo.architecture.product.domain.*;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -9,7 +7,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ProductMapper {
+class ProductMapper {
 
     public Product toDomain(ProductJpaEntity productJpaEntity) {
         return Product.withId()

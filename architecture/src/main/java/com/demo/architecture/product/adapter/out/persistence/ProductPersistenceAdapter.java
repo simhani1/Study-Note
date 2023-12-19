@@ -1,6 +1,5 @@
 package com.demo.architecture.product.adapter.out.persistence;
 
-import com.demo.architecture.product.adapter.out.mapper.ProductMapper;
 import com.demo.architecture.product.application.port.out.LoadProductPort;
 import com.demo.architecture.product.application.port.out.SaveProductPort;
 import com.demo.architecture.product.domain.Product;
@@ -10,7 +9,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
-public class ProductPersistenceAdapter implements LoadProductPort, SaveProductPort {
+class ProductPersistenceAdapter implements LoadProductPort, SaveProductPort {
 
     private final ProductJpaRepository productRepository;
     private final ProductMapper mapper;
