@@ -1,7 +1,7 @@
 package com.demo.architecture.product.adapter.in.web;
 
-import com.demo.architecture.product.adapter.in.web.response.StartSaleProductWebRes;
-import com.demo.architecture.product.application.command.StartSaleProductCommand;
+import com.demo.architecture.product.adapter.in.web.response.StartSalesProductWebRes;
+import com.demo.architecture.product.application.command.StartSalesProductCommand;
 import com.demo.architecture.product.application.port.in.SalesProductUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/web/products")
-public class ProductWebController {
+class ProductWebController {
 
     private final SalesProductUseCase salesProductUsecase;
 
@@ -23,10 +23,10 @@ public class ProductWebController {
      * @return
      */
     @PostMapping("/sale/{product-id}")
-    public ResponseEntity<StartSaleProductWebRes> startSaleProduct(@PathVariable(value = "product-id") Long productId) {
-        salesProductUsecase.salesProduct(StartSaleProductCommand.builder()
+    public ResponseEntity<StartSalesProductWebRes> startSalesProduct(@PathVariable(value = "product-id") Long productId) {
+        salesProductUsecase.startSalesProduct(StartSalesProductCommand.builder()
                 .productId(productId)
                 .build());
-        return ResponseEntity.ok(new StartSaleProductWebRes("[WEB] " + productId + "번 상품 판매가 시작되었습니다."));
+        return ResponseEntity.ok(new StartSalesProductWebRes("[WEB] " + productId + "번 상품 판매가 시작되었습니다."));
     }
 }
