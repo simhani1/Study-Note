@@ -1,6 +1,9 @@
 package com.demo.architecture.product.adapter.out.persistence;
 
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
@@ -8,7 +11,6 @@ import javax.persistence.*;
 @Entity
 @Table(name = "PRODUCT")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@ToString
 class ProductJpaEntity {
 
     @Id
