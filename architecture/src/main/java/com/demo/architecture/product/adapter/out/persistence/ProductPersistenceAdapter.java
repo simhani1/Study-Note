@@ -22,7 +22,8 @@ class ProductPersistenceAdapter implements LoadProductPort, SaveProductPort {
 
     @Override
     public void save(Product product) {
-        ProductJpaEntity productJpaEntity = mapper.toJpaEntity(product);
-        productRepository.save(productJpaEntity);
+        ProductJpaEntity target = mapper.toJpaEntity(product);
+        ProductJpaEntity productJpaEntity = productRepository.findById(product.getProductId()).orElseThrow(NoProductException::new);
+        productJpaEntity.update(target);
     }
 }

@@ -1,9 +1,6 @@
 package com.demo.architecture.product.adapter.out.persistence;
 
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 
@@ -11,6 +8,7 @@ import javax.persistence.*;
 @Entity
 @Table(name = "PRODUCT")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@ToString
 class ProductJpaEntity {
 
     @Id
@@ -41,5 +39,13 @@ class ProductJpaEntity {
         this.status = status;
         this.price = price;
         this.quantity = quantity;
+    }
+
+    public void update(ProductJpaEntity target) {
+        this.productName = target.getProductName();
+        this.seller = target.getSeller();
+        this.status = target.getStatus();
+        this.price = target.getPrice();
+        this.price = target.getPrice();
     }
 }

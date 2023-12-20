@@ -6,20 +6,13 @@ import lombok.Getter;
 @Getter
 public class Product {
 
-    private ProductId productId;
+    private Long productId;
     private ProductInfo productInfo;
     private ProductSalesInfo productSalesInfo;
     private ProductMetaInfo productMetaInfo;
 
-    @Builder
-    public Product(ProductInfo productInfo, ProductSalesInfo productSalesInfo, ProductMetaInfo productMetaInfo) {
-        this.productInfo = productInfo;
-        this.productSalesInfo = new ProductSalesInfo();
-        this.productMetaInfo = productMetaInfo;
-    }
-
     @Builder(builderMethodName = "withId")
-    public Product(ProductId productId, ProductInfo productInfo, ProductSalesInfo productSalesInfo, ProductMetaInfo productMetaInfo) {
+    public Product(Long productId, ProductInfo productInfo, ProductSalesInfo productSalesInfo, ProductMetaInfo productMetaInfo) {
         this.productId = productId;
         this.productInfo = productInfo;
         this.productSalesInfo = productSalesInfo;
