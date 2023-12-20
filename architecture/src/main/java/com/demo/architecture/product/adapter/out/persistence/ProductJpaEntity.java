@@ -42,4 +42,12 @@ class ProductJpaEntity {
         this.price = price;
         this.quantity = quantity;
     }
+
+    public void update(ProductJpaEntity target) {
+        this.productName = target.getProductName();
+        this.seller = target.getSeller();
+        this.status = target.getStatus();
+        this.price = target.getPrice();
+        this.price = target.getPrice();
+    }
 }

@@ -8,9 +8,8 @@ public class ProductSalesInfo {
 
     private SalesStatus status;
 
-    @Builder
     public ProductSalesInfo() {
-        this.status = SalesStatus.WAITING;
+        this(SalesStatus.WAITING);
     }
 
     @Builder(builderMethodName = "withStatus")

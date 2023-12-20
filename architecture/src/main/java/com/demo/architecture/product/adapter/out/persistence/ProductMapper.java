@@ -11,9 +11,7 @@ class ProductMapper {
 
     public Product toDomain(ProductJpaEntity productJpaEntity) {
         return Product.withId()
-                .productId(ProductId.builder()
-                        .productId(productJpaEntity.getId())
-                        .build())
+                .productId(productJpaEntity.getId())
                 .productInfo(ProductInfo.builder()
                         .productName(productJpaEntity.getProductName())
                         .seller(productJpaEntity.getSeller())
