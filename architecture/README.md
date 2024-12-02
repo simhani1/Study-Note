@@ -2,12 +2,12 @@
   <h1>hexagonal-architecture-with-spring-boot-practice</h1>
 </div>
 
+> [CMC 컨퍼런스 발표 자료](https://drive.google.com/file/d/1a6rPCEZW-yQB-x1VWvZL28xUC4CkRez-/view?usp=sharing)
+
 ![](img/hexagonal.png)
 
 - 포트에 맞는 어댑터를 구현하여 `저수준 모듈`(세부 구현 기술, 외부 인프라 기술...)이 `고수준 모듈`(서비스 & 도메인 계층)에 의존하도록 의존성을 역전시킨다.
 - 도메인은 세부 구현기술을 모르기 때문에 안전하게 보호받을 수 있다.
-
-## [CMC 컨퍼런스 발표 자료](https://www.canva.com/design/DAF2WW_cTQc/KOp91iXml3ZU733MOSpYKQ/view?utm_content=DAF2WW_cTQc&utm_campaign=designshare&utm_medium=link&utm_source=editor)
 
 ## 패키지 구조
 ```text
